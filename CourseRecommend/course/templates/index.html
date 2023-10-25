@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Recommendation - CurriculumCraft</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('background.jpg'); /* Set your background image here */
+            background-size: cover;
+            background-repeat: no-repeat;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .header {
+            background-color: #007BFF; /* Blue color for the header */
+            color: #fff; /* Text color for the header */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 10px 0;
+        }
+
+        #logo-box {
+            background-color: #fff; /* White background for the logo box */
+            padding: 10px;
+            border-radius: 50%; /* Makes the box a circle */
+            margin-right: 10px;
+        }
+
+        #logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007BFF; /* Blue color for the "CC" logo */
+        }
+
+        h1 {
+            color: #fff;
+            font-family: 'Your Desired Font', sans-serif; /* Change 'Your Desired Font' to the desired font family */
+            margin: 20px 0;
+        }
+
+        .content {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 1000px;
+            padding: 0 20px;
+        }
+
+        form {
+            background-color: #f9f9f9; /* Light gray background color */
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            width: 48%; /* Adjust as needed for the desired spacing */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            margin: 10px 0;
+        }
+
+        label {
+            display: block;
+            text-align: left;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #007BFF;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        .recommendations {
+            background-color: #f9f9f9; /* Light gray background color */
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            width: 48%; /* Adjust as needed for the desired spacing */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            margin: 10px 0;
+            text-align: left; /* Align text to the left */
+        }
+
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.5s ease-in-out;
+        }
+
+        /* Additional styles for the clear button */
+        .clear-button {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .clear-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div id="logo-box">
+            <div id="logo">CC</div>
+        </div>
+        <h1>CurriculumCraft</h1>
+    </div>
+
+    <div class="content">
+        <form method="post" action="{% url 'course_recommendation' %}" onsubmit="return validateForm()">
+            {% csrf_token %}
+            <label for="organization">Organization:</label>
+            <select name="organization" id="organization" required>
+                <option value="Duke University">Duke University</option>
+                <option value="University of Pennsylvania">University of Pennsylvania</option>
+                <option value="Johns Hopkins University">Johns Hopkins University</option>
+                <option value="Yale University">Yale University</option>
+                <option value="Indian School of Business">Indian School of Business</option>
+              <option value="University at Buffalo">University at Buffalo</option>
+                <option value="The University of Edinburgh">The University of Edinburgh</option>
+              <option value="IBM">IBM</option>
+              <option value="Amazon Web Services">Amazon Web Services</option>
+              <option value="University of Toronto">University of Toronto</option>
+              <option value="University of Michigan">University of Michigan</option>
+                <option value="Google">Google</option>
+                <option value="University of Virginia">University of Virginia</option>
+                <option value="Imperial College London">Imperial College London</option>
+                <option value="Google Cloud">Google Cloud</option>
+                <option value="Stanford University">Stanford University</option>
+                <option value="The Hong Kong University of Science and Technology">The Hong Kong University of Science and Technology</option>
+                <option value="Macquarie University">Macquarie University</option>
+                <option value="University of Michigan">University of Michigan</option>
+                <!-- Add more options as needed -->
+            </select>
+
+            <label for="certificate_type">Certificate Type:</label>
+            <select name="certificate_type" id="certificate_type" required>
+                <option value="course">Course</option>
+                <option value="specialization">Specialization</option>
+            </select>
+            <label for "difficulty">Difficulty:</label>
+            <select name="difficulty" id="difficulty" required>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="mixed">Mixed</option>
+            </select>
+            <input type="submit" value="Get Recommendations">
+        </form>
+
+        <div class="recommendations">
+            {% if recommended_courses %}
+            <h2>Recommended Courses:</h2>
+            <ul>
+                {% for course in recommended_courses %}
+                    <li>{{ course }}</li>
+                {% endfor %}
+            </ul>
+            <button class="clear-button" onclick="clearRecommendations()">Clear Recommendations</button>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function validateForm() {
+            var organization = document.getElementById("organization").value;
+            var certificateType = document.getElementById("certificate_type").value;
+            var difficulty = document.getElementById("difficulty").value;
+
+            var organizationPattern = /^[A-Za-z\s]+$/;
+            var certificateTypePattern = /^[A-Za-z\s]+$/;
+            var difficultyPattern = /^[A-Za-z\s]+$/;
+
+            if (!organization.match(organizationPattern)) {
+                alert("Please enter a valid organization name.");
+                return false;
+            }
+
+            if (!certificateType.match(certificateTypePattern)) {
+                alert("Please enter a valid certificate type.");
+                return false;
+            }
+
+            if (!difficulty.match(difficultyPattern)) {
+                alert("Please enter a valid difficulty level.");
+                return false;
+            }
+
+            return true;
+        }
+
+        function clearRecommendations() {
+            var recommendedCoursesList = document.querySelector("ul");
+            recommendedCoursesList.innerHTML = "";
+        }
+    </script>
+</body>
+</html>
